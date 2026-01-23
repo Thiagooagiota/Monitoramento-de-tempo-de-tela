@@ -591,8 +591,41 @@ class ConfiguracoesDialog(ctk.CTkToplevel):
         self.destroy()
         
 
+class NotificacaoDialog(ctk.CTkToplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Tempo limite atingido")
+
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        x = screen_width-300-20
+        y = screen_height-150-90
+
+        self.geometry(f"300x150+{x}+{y}") 
+
+        self.columnconfigure((0,1), weight=1)
+
+        label = ctk.CTkLabel(self, text="Tempo limite atingido", fg_color="transparent", font=("Helvetica", 15))
+        label.grid(row=0, column=0, columnspan=2, padx=20, pady=10, sticky="nsew")
+
+
+        btn_pausa = ctk.CTkButton(self, text="Ir para\npausa", width=75)
+        btn_pausa.grid(row=2, column=0, padx=20, pady=10, sticky="e")
+
+        btn_add_tempo = ctk.CTkButton(self, text="Adicionar\ntempo", width=75)
+        btn_add_tempo.grid(row=2, column=1, padx=10, pady=10, sticky="w")
+
+        entry = ctk.CTkEntry(self, placeholder_text="+ min", width=60)
+        entry.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
 
 if __name__ == "__main__":
-    app = App()
+    app = ctk.CTk()
+    app.geometry("400x240")
+    app.title("Janela")
+
+    NotificacaoDialog(app)
+
+    
     app.mainloop()
