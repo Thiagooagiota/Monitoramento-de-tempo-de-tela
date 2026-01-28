@@ -9,14 +9,6 @@ def banco_puxar(data_where):
     with conn.cursor() as cur:
         cur.execute("""SELECT * FROM tempo_de_tela WHERE data_uso = %s""", (data_where,))
         rows = cur.fetchall()
-        
-        for row in rows:
-            # row[0] é o datetime.date
-            app = row[1]
-            data = row[2].strftime("%d/%m/%Y")  # Formato: dia/mês/ano
-            duracao = str(row[3])
-            
-            print(f'jogo: {app}, data: {data}, tempo de uso: {duracao}')
         return rows
     conn.close()
 
@@ -28,14 +20,6 @@ def banco_puxar_tudo():
     with conn.cursor() as cur:
         cur.execute("""SELECT * FROM tempo_de_tela""")
         rows = cur.fetchall()
-        
-        for row in rows:
-            # row[0] é o datetime.date
-            app = row[1]
-            data = row[2].strftime("%d/%m/%Y")  # Formato: dia/mês/ano
-            duracao = str(row[3])
-            
-            print(f'jogo: {app}, data: {data}, tempo de uso: {duracao}')
         return rows
     conn.close()
 

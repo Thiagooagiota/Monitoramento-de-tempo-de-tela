@@ -544,10 +544,6 @@ class RelatorioDialog(ctk.CTkToplevel):
     def listar_dados_do_dia(self):
         self.dados = []
         rows = banco_puxar(f"{date.today()}")
-        
-        print(rows)
-        print(rows[1])
-        # Esboço
 
         for i, row in enumerate(rows, start=1):
             self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=14, weight="bold"))
@@ -565,9 +561,6 @@ class RelatorioDialog(ctk.CTkToplevel):
             
         self.dados = []
         rows = banco_puxar_tudo()
-        
-        print(rows)
-        print(f"\n{rows[1]}")
 
         for i, row in enumerate(rows, start=1):
             self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=14, weight="bold"))
