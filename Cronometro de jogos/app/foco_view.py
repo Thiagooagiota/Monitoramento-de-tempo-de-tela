@@ -52,6 +52,7 @@ class FocoView(ctk.CTkFrame):
         self.em_execucao = False
         self.id_temporizador = None
         self.dialogo_configuracoes = None
+        self.janela_relatorio = None
         self.tracker = time_check.JanelaTracker()
 
         self.state_vars = {
@@ -72,11 +73,20 @@ class FocoView(ctk.CTkFrame):
     def configurar_interface(self):
         barra_superior = ctk.CTkFrame(self, height=60, fg_color="transparent")
         barra_superior.pack(fill="x", padx=20, pady=(10, 20))
+        barra_superior.columnconfigure((0,1), weight=1)
+
 
         btn_config = ctk.CTkButton(barra_superior, text="Configurações", command=self.abrir_configuracoes,
                                    font=ctk.CTkFont(size=14, weight="bold"), fg_color="#2e7bf6", hover_color="#1e5bb4",
                                    corner_radius=10, width=150)
-        btn_config.grid(row=0, column=0, padx=0, pady=10)
+        btn_config.grid(row=0, column=0, padx=0, pady=10, sticky="w")
+
+
+        btn_relatorio = ctk.CTkButton(barra_superior, text="Relatório", command=self.abrir_relatorio,
+                                   font=ctk.CTkFont(size=14, weight="bold"), fg_color="#2e7bf6", hover_color="#1e5bb4",
+                                   corner_radius=10, width=150)
+        btn_relatorio.grid(row=0, column=1, padx=0, pady=10, sticky="e")
+
 
         container_principal = ctk.CTkFrame(self, fg_color="transparent")
         container_principal.pack(fill="both", expand=True, padx=20, pady=10)
@@ -94,6 +104,14 @@ class FocoView(ctk.CTkFrame):
             self.dialogo_configuracoes.focus()
         else:
             self.dialogo_configuracoes = ConfiguracoesDialog(self, self.state_vars)
+
+    def abrir_relatorio(self):
+        if self.janela_relatorio and self.janela_relatorio.winfo_exists():
+            self.janela_relatorio.focus()
+        else:
+            self.janela_relatorio = RelatorioDialog(self)
+        
+
 
     def criar_painel_esquerdo(self):
         self.painel.grid_rowconfigure(2, weight=1)
@@ -465,3 +483,74 @@ class NotificacaoDialog(ctk.CTkToplevel):
         except ValueError:
             pass
         self.destroy()
+        
+
+
+
+class RelatorioDialog(ctk.CTkToplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.title("Relatório de Uso do Dia")
+        self.geometry("500x450")
+        self.transient(parent)
+        self.focus_set()
+        self.grab_set()
+
+        # título da janela        
+        self.titulo = ctk.CTkLabel(self, text="Relatório de Uso", font=ctk.CTkFont(size=16, weight="bold"))
+        self.titulo.pack(padx=20, pady=(10))
+
+        self.frame_relatorio = ctk.CTkFrame(self, fg_color="transparent")
+        self.frame_relatorio.pack(padx=10, pady=(0, 10), fill="both", expand=True)
+        # Frame do topo da Tabela
+        self.frame_header = ctk.CTkFrame(self.frame_relatorio, fg_color="transparent")
+        self.frame_header.pack(fill="x")
+        
+        self.frame_header.columnconfigure((0,1,2), weight=1)
+        
+        self.aplicacao_lbl = ctk.CTkLabel(self.frame_header, text="App", font=ctk.CTkFont(size=14, weight="bold"))
+        self.aplicacao_lbl.grid(row=0, column=0)
+
+        self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_header, text="Tempo de uso", font=ctk.CTkFont(size=14, weight="bold"))
+        self.tempo_de_uso_lbl.grid(row=0, column=1)
+        
+        self.data_lbl = ctk.CTkLabel(self.frame_header, text="Data", font=ctk.CTkFont(size=14, weight="bold"))
+        self.data_lbl.grid(row=0, column=2)
+        
+        # Frame dos dados
+        self.frame_dados = ctk.CTkScrollableFrame(self.frame_relatorio)
+        self.frame_dados.pack(fill="both", expand=True)
+        
+        btn_ver_mais = ctk.CTkButton(self.frame_relatorio, 
+                                     text="Ver mais",
+                                     font=ctk.CTkFont(size=14, weight="bold"), 
+                                     fg_color="#2e7bf6", 
+                                     hover_color="#1e5bb4",
+                                     corner_radius=10, 
+                                     width=150,
+                                     command=self.gerar_mais_dados)
+        btn_ver_mais.pack(fill="x", side="right")
+        
+        
+        self.listar_dados_do_dia()
+        
+    # Funções para gerar dados na tabela a implementar
+    def listar_dados_do_dia(self):
+        ...
+        # Esboço
+        # for i in self.dados:
+        #     self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{i[0]}", font=ctk.CTkFont(size=14, weight="bold"))
+        #     self.aplicacao_lbl.grid(row=(i+1), column=0, padx=20)
+
+        #     self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{i[1]}", font=ctk.CTkFont(size=14, weight="bold"))
+        #     self.tempo_de_uso_lbl.grid(row=(i+1), column=1, padx=20)
+            
+        #     self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{i[2]}", font=ctk.CTkFont(size=14, weight="bold"))
+        #     self.data_lbl.grid(row=(i+1), column=2, padx=20)
+    
+    def gerar_mais_dados(self):
+        ...
+            
+        
+    
