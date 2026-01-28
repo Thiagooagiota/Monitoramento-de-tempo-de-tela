@@ -9,6 +9,8 @@ import json
 import time_check
 from datetime import date
 from banco import banco_adicionar
+from banco import banco_puxar
+from banco import banco_puxar_tudo
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -521,6 +523,9 @@ class RelatorioDialog(ctk.CTkToplevel):
         # Frame dos dados
         self.frame_dados = ctk.CTkScrollableFrame(self.frame_relatorio)
         self.frame_dados.pack(fill="both", expand=True)
+
+        self.frame_dados.columnconfigure((0,1,2), weight=1)
+
         
         btn_ver_mais = ctk.CTkButton(self.frame_relatorio, 
                                      text="Ver mais",
@@ -537,20 +542,41 @@ class RelatorioDialog(ctk.CTkToplevel):
         
     # Funções para gerar dados na tabela a implementar
     def listar_dados_do_dia(self):
-        ...
+        self.dados = []
+        rows = banco_puxar(f"{date.today()}")
+        
+        print(rows)
+        print(rows[1])
         # Esboço
-        # for i in self.dados:
-        #     self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{i[0]}", font=ctk.CTkFont(size=14, weight="bold"))
-        #     self.aplicacao_lbl.grid(row=(i+1), column=0, padx=20)
 
-        #     self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{i[1]}", font=ctk.CTkFont(size=14, weight="bold"))
-        #     self.tempo_de_uso_lbl.grid(row=(i+1), column=1, padx=20)
+        for i, row in enumerate(rows, start=1):
+            self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=14, weight="bold"))
+            self.aplicacao_lbl.grid(row=i, column=0, padx=20)
+
+            self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[3]}", font=ctk.CTkFont(size=14, weight="bold"))
+            self.tempo_de_uso_lbl.grid(row=i, column=1, padx=20)
             
-        #     self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{i[2]}", font=ctk.CTkFont(size=14, weight="bold"))
-        #     self.data_lbl.grid(row=(i+1), column=2, padx=20)
+            self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[2]}", font=ctk.CTkFont(size=14, weight="bold"))
+            self.data_lbl.grid(row=i, column=2, padx=20)
     
     def gerar_mais_dados(self):
-        ...
+        for widget in self.frame_dados.winfo_children():
+            widget.destroy()
             
+        self.dados = []
+        rows = banco_puxar_tudo()
+        
+        print(rows)
+        print(f"\n{rows[1]}")
+
+        for i, row in enumerate(rows, start=1):
+            self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=14, weight="bold"))
+            self.aplicacao_lbl.grid(row=i, column=0, padx=20)
+
+            self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[3]}", font=ctk.CTkFont(size=14, weight="bold"))
+            self.tempo_de_uso_lbl.grid(row=i, column=1, padx=20)
+            
+            self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[2]}", font=ctk.CTkFont(size=14, weight="bold"))
+            self.data_lbl.grid(row=i, column=2, padx=20)                    
         
     

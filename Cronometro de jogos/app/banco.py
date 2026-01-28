@@ -7,7 +7,7 @@ def banco_puxar(data_where):
     conn = psycopg.connect(DATABASE_URL)
 
     with conn.cursor() as cur:
-        cur.execute(f"SELECT * FROM tempo_de_tela WHERE data_uso = {data_where}")
+        cur.execute("""SELECT * FROM tempo_de_tela WHERE data_uso = %s""", (data_where,))
         rows = cur.fetchall()
         
         for row in rows:
@@ -17,9 +17,27 @@ def banco_puxar(data_where):
             duracao = str(row[3])
             
             print(f'jogo: {app}, data: {data}, tempo de uso: {duracao}')
-
+        return rows
     conn.close()
 
+def banco_puxar_tudo():
+    DATABASE_URL = 'postgresql://neondb_owner:npg_yhCYPL6JISw9@ep-raspy-thunder-ah9iqt48-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+
+    conn = psycopg.connect(DATABASE_URL)
+
+    with conn.cursor() as cur:
+        cur.execute("""SELECT * FROM tempo_de_tela""")
+        rows = cur.fetchall()
+        
+        for row in rows:
+            # row[0] é o datetime.date
+            app = row[1]
+            data = row[2].strftime("%d/%m/%Y")  # Formato: dia/mês/ano
+            duracao = str(row[3])
+            
+            print(f'jogo: {app}, data: {data}, tempo de uso: {duracao}')
+        return rows
+    conn.close()
 
 def banco_adicionar(app_usado, data_uso, tempo_de_uso):
     DATABASE_URL = 'postgresql://neondb_owner:npg_yhCYPL6JISw9@ep-raspy-thunder-ah9iqt48-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
