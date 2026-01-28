@@ -7,6 +7,8 @@ except ImportError:
 from pathlib import Path
 import json
 import time_check
+from datetime import date
+from banco import banco_adicionar
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -192,25 +194,32 @@ class FocoView(ctk.CTkFrame):
             if modo == "tempo_de_jogo":
                 self.tracker.parar()
 
-                tempo_sessao = self.tracker.get_tempo_sessao()
-                tempo_formatado = f"{int(tempo_sessao // 60):02d}:{int(tempo_sessao % 60):02d}"
+                hoje = date.today()
+
+                tempo_esperado = self.segundos_iniciais
+                tempo_coletado = self.tracker.tempo_sessao
+
+                diferenca = tempo_coletado - tempo_esperado
+
+                # Ajuste simples: se diferença > 1s, tira do app com mais tempo
+                if diferenca > 1:
+                    if diferenca > 10:
+                        print(f"[Aviso] Diferença detectada: +{diferenca:.1f}s nesta sessão")
+
+                    # Pega o app com mais tempo
+                    if self.tracker.tempo_por_app_sessao:
+                        app_mais_tempo = max(self.tracker.tempo_por_app_sessao, key=self.tracker.tempo_por_app_sessao.get)
+                        reducao = min(diferenca, self.tracker.tempo_por_app_sessao[app_mais_tempo])
+                        self.tracker.tempo_por_app_sessao[app_mais_tempo] -= reducao
+                        self.tracker.tempo_sessao -= reducao
+
+                # Salva os valores já corrigidos
                 relatorio = self.tracker.get_relatorio_sessao()
-
-                total_acumulado = self.tracker.get_tempo_total_acumulado()
-                total_formatado = f"{int(total_acumulado // 3600):02d}:{int((total_acumulado % 3600) // 60):02d}:{int(total_acumulado % 60):02d}"
-
-                print(f"\nSessão finalizada!")
-                print(f"Tempo total da sessão atual: {tempo_formatado}")
-                print("RELATÓRIO DA SESSÃO (tempo por app):")
                 if relatorio:
-                    for app, tempo in sorted(relatorio.items(), key=lambda x: x[1], reverse=True):
-                        print(f"{app}: {tempo:.1f}s ({tempo / 60:.1f} min)")
-                else:
-                    print("Nenhum app detectado nesta sessão.")
+                    for app, segundos in relatorio.items():
+                        if segundos >= 5:
+                            banco_adicionar(app, hoje, segundos)
 
-                print(f"Tempo total acumulado (todas as sessões): {total_formatado}")
-
-                # Reseta a sessão atual para o próximo ciclo ser independente
                 self.tracker.reset_sessao()
 
             if self.state_vars["som_alarme"].get() == "Sino":
@@ -225,6 +234,7 @@ class FocoView(ctk.CTkFrame):
             if self.state_vars["auto_pausa"].get() and modo == "tempo_de_jogo":
                 self.after(1000, self.alternar_proximo_modo_e_iniciar)
 
+    # ... resto da classe permanece igual (bell, alternar_proximo_modo_e_iniciar, restaurar_tempo, etc.) ...
     def bell(self, caminho_som):
         try:
             if mixer:
@@ -255,15 +265,15 @@ class FocoView(ctk.CTkFrame):
                 self.after_cancel(self.id_temporizador)
             self.btn_iniciar.configure(text="Iniciar")
             if modo == "tempo_de_jogo":
-                self.tracker.parar()  # Garante que tracker pare quando pausa
+                self.tracker.parar()
         else:
             # Iniciar
             self.em_execucao = True
             self.btn_iniciar.configure(text="Pausar")
             if modo == "tempo_de_jogo":
-                self.tracker.iniciar()  # Só inicia/retoma quando usuário clica "Iniciar"
+                self.tracker.iniciar()
             self.atualizar_exibicao_temporizador()
-
+            
     def alternar_proximo_modo_e_iniciar(self):
         if self.em_execucao:
             return

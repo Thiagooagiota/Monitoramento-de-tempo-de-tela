@@ -37,21 +37,18 @@ class JanelaTracker:
             app = self.get_app_atual()
             agora = time.time()
 
-            if self.ultimo_app is None:
-                self.ultimo_app = app
-                self.ultimo_tempo = agora
-                time.sleep(0.5)
-                continue
+            # Sempre calcula o delta desde a última medição
+            delta = agora - self.ultimo_tempo
 
-            if app != self.ultimo_app:
-                delta = agora - self.ultimo_tempo
-                # Atualiza sessão atual
+            # Se já temos um app anterior, acumula o tempo nele
+            if self.ultimo_app is not None:
                 self.tempo_por_app_sessao[self.ultimo_app] += delta
                 self.tempo_sessao += delta
-                # Atualiza total acumulado (todas sessões)
                 self.tempo_total_acumulado += delta
-                self.ultimo_app = app
-                self.ultimo_tempo = agora
+
+            # Atualiza o app atual e o timestamp
+            self.ultimo_app = app
+            self.ultimo_tempo = agora
 
             time.sleep(0.5)
 
