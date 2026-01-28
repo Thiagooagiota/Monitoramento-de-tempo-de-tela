@@ -450,8 +450,10 @@ class NotificacaoDialog(ctk.CTkToplevel):
         sh = self.winfo_screenheight()
         self.geometry(f"300x150+{sw-320}+{sh-200}")
         self.transient(parent)
+        self.attributes('-topmost', True)
         self.focus_set()
         self.grab_set()
+        
 
         ctk.CTkLabel(self, text="Tempo limite atingido!", font=ctk.CTkFont(size=16, weight="bold")).grid(
             row=0, column=0, columnspan=2, padx=20, pady=10)
