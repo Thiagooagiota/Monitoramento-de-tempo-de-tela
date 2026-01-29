@@ -7,8 +7,8 @@ from foco_view import FocoView
 class AppController:
     def __init__(self):
         self.root = ctk.CTk()
-        self.root.geometry("900x700+10+10")
-        self.root.title("FocusDesk AI")
+        self.root.geometry("550x500+10+10")
+        self.root.title("Monitoramento de Tela")
         ctk.set_appearance_mode("Dark")
 
         

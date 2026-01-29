@@ -120,13 +120,13 @@ class FocoView(ctk.CTkFrame):
         self.painel.grid_columnconfigure(0, weight=1)
         self.painel.grid_columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(self.painel, text="Foco Total", font=ctk.CTkFont(size=28, weight="bold")).grid(
+        ctk.CTkLabel(self.painel, text="Controle de Tempo de Tela", font=ctk.CTkFont(size=28, weight="bold")).grid(
             row=0, column=0, columnspan=2, pady=(20, 15), sticky="n")
 
         frame_modos = ctk.CTkFrame(self.painel, fg_color="transparent")
         frame_modos.grid(row=1, column=0, columnspan=2, pady=10)
 
-        self.btn_tempo_de_jogo = self.criar_botao_modo(frame_modos, "tempo_de_jogo", 0)
+        self.btn_tempo_de_jogo = self.criar_botao_modo(frame_modos, "Tempo de Jogo", 0)
         self.btn_pausa = self.criar_botao_modo(frame_modos, "Pausa", 2)
 
         self.state_vars["modo_atual"].trace_add("write", self.atualizar_selecao_modo)
@@ -324,6 +324,7 @@ class ConfiguracoesDialog(ctk.CTkToplevel):
         self.focus_set()
         self.grab_set()
         self.state_vars = state_vars
+        self.configure(fg_color="#0f1113")
 
         self.tempo_de_jogo_var = ctk.StringVar(value=str(state_vars["tempo_de_jogo"].get()))
         self.tempo_pausa_var = ctk.StringVar(value=str(state_vars["tempo_pausa"].get()))
@@ -354,11 +355,11 @@ class ConfiguracoesDialog(ctk.CTkToplevel):
         row += 1
 
         ctk.CTkLabel(content_frame, text="tempo_de_jogo (min):").grid(row=row, column=0, padx=10, pady=5, sticky="w")
-        ctk.CTkEntry(content_frame, textvariable=self.tempo_de_jogo_var).grid(row=row, column=1, padx=10, pady=5, sticky="ew")
+        ctk.CTkEntry(content_frame, fg_color="#111316", textvariable=self.tempo_de_jogo_var).grid(row=row, column=1, padx=10, pady=5, sticky="ew")
         row += 1
 
         ctk.CTkLabel(content_frame, text=" pausa (min):").grid(row=row, column=0, padx=10, pady=5, sticky="w")
-        ctk.CTkEntry(content_frame, textvariable=self.tempo_pausa_var).grid(row=row, column=1, padx=10, pady=5, sticky="ew")
+        ctk.CTkEntry(content_frame, fg_color="#111316", textvariable=self.tempo_pausa_var).grid(row=row, column=1, padx=10, pady=5, sticky="ew")
         row += 1
 
         ctk.CTkLabel(content_frame, text="Pausas automáticas:").grid(row=row, column=0, padx=10, pady=5, sticky="w")
@@ -374,12 +375,18 @@ class ConfiguracoesDialog(ctk.CTkToplevel):
         row += 1
 
         ctk.CTkLabel(content_frame, text="Som de alarme:").grid(row=row, column=0, padx=10, pady=8, sticky="w")
-        self.option_som = ctk.CTkOptionMenu(content_frame, values=["Sino", "Nenhum"], width=150, variable=self.som_alarme_var)
+        self.option_som = ctk.CTkOptionMenu(content_frame, values=["Sino", "Nenhum"], 
+                                            font=ctk.CTkFont(size=14), 
+                                            fg_color="#2e7bf6", 
+                                            width=150, variable=self.som_alarme_var)
         self.option_som.grid(row=row, column=1, padx=10, pady=8, sticky="e")
         row += 1
 
         ctk.CTkLabel(content_frame, text="Som de tique-taque:").grid(row=row, column=0, padx=10, pady=8, sticky="w")
-        self.option_tictac = ctk.CTkOptionMenu(content_frame, values=["Nenhum", "Padrão"], width=150, variable=self.som_tictac_var)
+        self.option_tictac = ctk.CTkOptionMenu(content_frame, values=["Nenhum", "Padrão"],
+                                               font=ctk.CTkFont(size=14), 
+                                               fg_color="#2e7bf6", 
+                                               width=150, variable=self.som_tictac_var)
         self.option_tictac.grid(row=row, column=1, padx=10, pady=8, sticky="e")
 
         button_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -441,6 +448,7 @@ class ConfiguracoesDialog(ctk.CTkToplevel):
             if hasattr(self, 'option_tictac'):
                 self.option_tictac.set("Nenhum")
 
+
 class NotificacaoDialog(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -448,24 +456,43 @@ class NotificacaoDialog(ctk.CTkToplevel):
         self.title("Tempo limite atingido")
         sw = self.winfo_screenwidth()
         sh = self.winfo_screenheight()
-        self.geometry(f"300x150+{sw-320}+{sh-200}")
+        self.geometry(f"300x190+{sw-320}+{sh-285}")
         self.transient(parent)
         self.attributes('-topmost', True)
         self.focus_set()
         self.grab_set()
-        
+        self.configure(fg_color="#0f1113")
+        self.columnconfigure((0,1), weight=1)
 
         ctk.CTkLabel(self, text="Tempo limite atingido!", font=ctk.CTkFont(size=16, weight="bold")).grid(
             row=0, column=0, columnspan=2, padx=20, pady=10)
 
-        self.entry_minutos = ctk.CTkEntry(self, placeholder_text="+ minutos", width=100)
-        self.entry_minutos.grid(row=1, column=1, padx=10, pady=5, sticky="w")
+        btn_pausa = ctk.CTkButton(self, text="Ir para pausa",  
+                                  width=40, 
+                                  font=ctk.CTkFont(size=14, weight="bold"), 
+                                  fg_color="#2e7bf6", 
+                                  hover_color="#1e5bb4",
+                                  corner_radius=10,
+                                  command=self.ir_para_pausa)
+        btn_pausa.grid(row=1, column=0, columnspan=2, padx=10, pady=(20,5))
+        
+        frame_entry = ctk.CTkFrame(self, fg_color="transparent")
+        frame_entry.grid(row=2, column=0, padx=10, pady=5, sticky="e")
+        
+        self.entry_minutos = ctk.CTkEntry(frame_entry, placeholder_text="+", width=40, corner_radius=8,fg_color="#111316")
+        self.entry_minutos.grid(row=0, column=0, padx=10, pady=5)
+        
+        self.lbl_minutos = ctk.CTkLabel(frame_entry, text="min", font=ctk.CTkFont(size=12, weight="bold"))
+        self.lbl_minutos.grid(row=0, column=1, padx=5, pady=5)
 
-        btn_pausa = ctk.CTkButton(self, text="Ir para pausa", command=self.ir_para_pausa)
-        btn_pausa.grid(row=2, column=0, padx=20, pady=10, sticky="e")
-
-        btn_add = ctk.CTkButton(self, text="Adicionar tempo", command=self.adicionar_tempo)
-        btn_add.grid(row=2, column=1, padx=10, pady=10, sticky="w")
+        btn_add = ctk.CTkButton(self, text="Adicionar Tempo", 
+                                width=40, 
+                                font=ctk.CTkFont(size=14, weight="bold"), 
+                                fg_color="#2e7bf6", 
+                                hover_color="#1e5bb4",
+                                corner_radius=10,
+                                command=self.adicionar_tempo)
+        btn_add.grid(row=2, column=1, padx=10, pady=20, sticky="w")
 
     def ir_para_pausa(self):
         self.parent.state_vars["modo_atual"].set("Pausa")
@@ -500,33 +527,36 @@ class RelatorioDialog(ctk.CTkToplevel):
         self.transient(parent)
         self.focus_set()
         self.grab_set()
-
+        
+        self.configure(fg_color="#0f1113")
         # título da janela        
         self.titulo = ctk.CTkLabel(self, text="Relatório de Uso", font=ctk.CTkFont(size=16, weight="bold"))
         self.titulo.pack(padx=20, pady=(10))
 
-        self.frame_relatorio = ctk.CTkFrame(self, fg_color="transparent")
+        self.frame_relatorio = ctk.CTkFrame(self, fg_color="transparent", border_width=1, border_color="#2a2d2e")
         self.frame_relatorio.pack(padx=10, pady=(0, 10), fill="both", expand=True)
         # Frame do topo da Tabela
         self.frame_header = ctk.CTkFrame(self.frame_relatorio, fg_color="transparent")
-        self.frame_header.pack(fill="x")
+        self.frame_header.pack(fill="x", padx=5, pady=5)
         
-        self.frame_header.columnconfigure((0,1,2), weight=1)
+        self.frame_header.columnconfigure((0), weight=3)
+        self.frame_header.columnconfigure((1,2), weight=2)
         
         self.aplicacao_lbl = ctk.CTkLabel(self.frame_header, text="App", font=ctk.CTkFont(size=14, weight="bold"))
-        self.aplicacao_lbl.grid(row=0, column=0)
+        self.aplicacao_lbl.grid(row=0, column=0, padx=15, sticky="w")
 
         self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_header, text="Tempo de uso", font=ctk.CTkFont(size=14, weight="bold"))
-        self.tempo_de_uso_lbl.grid(row=0, column=1)
+        self.tempo_de_uso_lbl.grid(row=0, column=1, sticky="e")
         
         self.data_lbl = ctk.CTkLabel(self.frame_header, text="Data", font=ctk.CTkFont(size=14, weight="bold"))
-        self.data_lbl.grid(row=0, column=2)
+        self.data_lbl.grid(row=0, column=2, padx=(0,10), sticky="e")
         
         # Frame dos dados
-        self.frame_dados = ctk.CTkScrollableFrame(self.frame_relatorio)
-        self.frame_dados.pack(fill="both", expand=True)
+        self.frame_dados = ctk.CTkScrollableFrame(self.frame_relatorio, fg_color="transparent")
+        self.frame_dados.pack(fill="both", expand=True, padx=5, pady=5)
 
-        self.frame_dados.columnconfigure((0,1,2), weight=1)
+        self.frame_dados.columnconfigure((0), weight=3)
+        self.frame_dados.columnconfigure((1,2), weight=2)
 
         
         btn_ver_mais = ctk.CTkButton(self.frame_relatorio, 
@@ -537,7 +567,7 @@ class RelatorioDialog(ctk.CTkToplevel):
                                      corner_radius=10, 
                                      width=150,
                                      command=self.gerar_mais_dados)
-        btn_ver_mais.pack(fill="x", side="right")
+        btn_ver_mais.pack(fill="x", side="right", padx=5, pady=5)
         
         
         self.listar_dados_do_dia()
@@ -548,14 +578,14 @@ class RelatorioDialog(ctk.CTkToplevel):
         rows = banco_puxar(f"{date.today()}")
 
         for i, row in enumerate(rows, start=1):
-            self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=14, weight="bold"))
-            self.aplicacao_lbl.grid(row=i, column=0, padx=20)
+            self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=12, weight="bold"))
+            self.aplicacao_lbl.grid(row=i, column=0, padx=(10,0), sticky="w")
 
-            self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[3]}", font=ctk.CTkFont(size=14, weight="bold"))
-            self.tempo_de_uso_lbl.grid(row=i, column=1, padx=20)
+            self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[3]}", font=ctk.CTkFont(size=12, weight="bold"))
+            self.tempo_de_uso_lbl.grid(row=i, column=1, sticky="e")
             
-            self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[2]}", font=ctk.CTkFont(size=14, weight="bold"))
-            self.data_lbl.grid(row=i, column=2, padx=20)
+            self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[2]}", font=ctk.CTkFont(size=12, weight="bold"))
+            self.data_lbl.grid(row=i, column=2, padx=(0,10), sticky="e")
     
     def gerar_mais_dados(self):
         for widget in self.frame_dados.winfo_children():
@@ -565,13 +595,13 @@ class RelatorioDialog(ctk.CTkToplevel):
         rows = banco_puxar_tudo()
 
         for i, row in enumerate(rows, start=1):
-            self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=14, weight="bold"))
-            self.aplicacao_lbl.grid(row=i, column=0, padx=20)
+            self.aplicacao_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[1]}", font=ctk.CTkFont(size=12, weight="bold"))
+            self.aplicacao_lbl.grid(row=i, column=0, padx=(10,0), sticky="w")
 
-            self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[3]}", font=ctk.CTkFont(size=14, weight="bold"))
-            self.tempo_de_uso_lbl.grid(row=i, column=1, padx=20)
+            self.tempo_de_uso_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[3]}", font=ctk.CTkFont(size=12, weight="bold"))
+            self.tempo_de_uso_lbl.grid(row=i, column=1, sticky="e")
             
-            self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[2]}", font=ctk.CTkFont(size=14, weight="bold"))
-            self.data_lbl.grid(row=i, column=2, padx=20)                    
+            self.data_lbl = ctk.CTkLabel(self.frame_dados, text=f"{row[2]}", font=ctk.CTkFont(size=12, weight="bold"))
+            self.data_lbl.grid(row=i, column=2, padx=(0,10), sticky="e")                    
         
     

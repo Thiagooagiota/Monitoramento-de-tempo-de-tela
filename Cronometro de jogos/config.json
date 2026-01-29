@@ -1,8 +1,8 @@
 {
     "tempo_de_jogo": 1,
-    "tempo_pausa": 1,
+    "tempo_pausa": 15,
     "auto_pausa": false,
     "modo_atual": "tempo_de_jogo",
-    "som_alarme": "Sino",
+    "som_alarme": "Nenhum",
     "som_tictac": "Nenhum"
 }
